@@ -14,12 +14,17 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 	public GameObject successCanvas;
 	public GameObject withdrawConfirmationCanvas;
 	public GameObject depositConfirmationCanvas;
+	public GameObject depositConfirmationCanvas2;
+	public GameObject transferConfirmationCanvas;
 
 	//On screen text, which updates as users click buttons
 	public Text withdrawAmntTxt, fromAcctTxt, toAcctTxt, depositAcctTxt, CHQTxt, SAVTxt, VISATxt, Acct1Txt, Acct2Txt;
 
 	//Numerical monetary values
-	public static double CHQ, SAV, VISA, ACCT1, ACCT2, withdrawAmnt, depositAmnt = 0.00;
+	public static double CHQ, SAV, VISA, ACCT1, ACCT2 = 1000.00;
+	public static double withdrawAmnt, depositAmnt, transferAmnt = 0.00;
+
+	public static string toAcct, fromAcct, withdrawAcct, depositAcct;
 
 	// Use this for initialization
 	void OnEnable () {
@@ -98,25 +103,30 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 			withdrawAmntTxt.text = withdrawAmnt.ToString();
 		}
 
-		/*if (this.gameObject.name == "CHQTxt") {
-			CHQTxt.text = withdrawAmnt.ToString();
+		if (this.gameObject.name == "CHQTxt") {
+			CHQTxt.text = CHQ.ToString();
 		}
 
 		if (this.gameObject.name == "SAVTxt") {
-			SAVTxt.text = withdrawAmnt.ToString();
+			SAVTxt.text = SAV.ToString();
 		}
 
 		if (this.gameObject.name == "VISATxt") {
-			VISATxt.text = withdrawAmnt.ToString();
+			VISATxt.text = VISA.ToString();
 		}
 
 		if (this.gameObject.name == "Acct1Txt") {
-			Acct1Txt.text = withdrawAmnt.ToString();
+			Acct1Txt.text = ACCT1.ToString();
 		}
 
 		if (this.gameObject.name == "Acct2Txt") {
-			Acct2Txt.text = withdrawAmnt.ToString();
-		}*/
+			Acct2Txt.text = ACCT2.ToString();
+		}
+
+		fromAcct = fromAcctTxt.text;
+		toAcct = toAcctTxt.text;
+		depositAcct = depositAcctTxt.text;
+		withdrawAcct = withdrawAmntTxt.text;
 
 	}
 
@@ -192,6 +202,11 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 					withdrawAmnt -= 100;
 				}
 
+				if (this.gameObject.name == "Confirm") {
+
+					withdrawConfirmationCanvas.gameObject.SetActive(true);
+				}
+
 			}
 
 			else if (depositCanvas.activeInHierarchy == true) {
@@ -221,20 +236,66 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 					depositAcctTxt.text = "ACCT2";
 				}
 
+				if (this.gameObject.name == "Confirm") {
+
+					depositConfirmationCanvas.gameObject.SetActive(true);
+				}
+
 			}
 
 			else if (successCanvas.activeInHierarchy == true) {
+			
+				if (this.gameObject.name == "Return") {
 
+					selectActionCanvas.gameObject.SetActive (true);
+					successCanvas.gameObject.SetActive(false);
+				}
 			}
 
 			else if (withdrawConfirmationCanvas.activeInHierarchy == true) {
 
-				
+				if (this.gameObject.name == "Confirm") {
 
+					if (withdrawAcct == "CHQ") {
+						CHQ -= withdrawAmnt;
+					}
+
+					//TODO Repeat for other accounts and display the amount
+				}
+				
 			}
 
 			else if (depositConfirmationCanvas.activeInHierarchy == true) {
 
+				if (this.gameObject.name == "Confirm") {
+
+					depositConfirmationCanvas2.gameObject.SetActive(true);
+					depositConfirmationCanvas.gameObject.SetActive(true);
+				}
+
+				if (this.gameObject.name == "Cancel") {
+
+					depositCanvas.gameObject.SetActive (true);
+					depositConfirmationCanvas.gameObject.SetActive(false);
+				}
+			}
+
+			else if (depositConfirmationCanvas2.activeInHierarchy == true) {
+
+				if (this.gameObject.name == "Confirm") {
+
+					if (depositAcct == "CHQ") {
+						CHQ += Random.Range (20, 2000);
+					}
+
+				//TODO Repeat for other accounts and display the amount
+				}
+
+				if (this.gameObject.name == "Cancel") {
+
+					depositCanvas.gameObject.SetActive (true);
+					depositConfirmationCanvas.gameObject.SetActive(false);
+				}
 			}
 
 			else if (transferCanvas.activeInHierarchy == true) {
@@ -251,7 +312,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 
 				if (this.gameObject.name == "FROMVISA") {
 					
-					fromAcctTxt.text = "VISA";
+					fromAcctTxt.text = fromAcct = "VISA";
 				}
 
 				if (this.gameObject.name == "FROMACCT1") {
@@ -290,9 +351,33 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 					toAcctTxt.text = "ACCT2";
 				}
 
+				if (this.gameObject.name == "Confirm") {
+
+					transferConfirmationCanvas.gameObject.SetActive(true);
+				}
 
 			}
 
+			else if (transferConfirmationCanvas.activeInHierarchy == true) {
+
+				if (this.gameObject.name == "Confirm") {
+
+					if (fromAcct == "CHQ") {
+					
+						if (toAcct == "SAV") {
+							SAV += transferAmnt;
+							CHQ -= transferAmnt;
+						}
+					
+					//TODO Repeat for other accounts and display the amount
+				}
+			}
+
+				if (this.gameObject.name == "Cancel") {
+
+					depositCanvas.gameObject.SetActive (true);
+					depositConfirmationCanvas.gameObject.SetActive(false);
+				}
 		}
-			
+	}
 }
