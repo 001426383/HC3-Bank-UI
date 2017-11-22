@@ -17,6 +17,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 	public GameObject depositConfirmationCanvas2;
 	public GameObject transferConfirmationCanvas;
 	public GameObject introCanvas;
+	public GameObject loginCanvas;
 
 	//On screen text, which updates as users click buttons
 	public Text withdrawAmntTxt, fromAcctTxt, toAcctTxt, depositAcctTxt, CHQTxt, SAVTxt, VISATxt, Acct1Txt, Acct2Txt;
@@ -40,7 +41,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 			successCanvas.SetActive (false);
 			withdrawConfirmationCanvas.SetActive (false);
 			depositConfirmationCanvas.SetActive (false);
-
+			loginCanvas.SetActive (false);
 		} else if (this.gameObject.name == "TransferCanvas") {
 
 			selectActionCanvas.SetActive (false);
@@ -50,7 +51,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 			withdrawConfirmationCanvas.SetActive (false);
 			depositConfirmationCanvas.SetActive (false);
 			introCanvas.SetActive (false);
-
+			loginCanvas.SetActive (false);
 		} else if (this.gameObject.name == "WithdrawCanvas") {
 
 			transferCanvas.SetActive (false);
@@ -60,7 +61,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 			withdrawConfirmationCanvas.SetActive (false);
 			depositConfirmationCanvas.SetActive (false);
 			introCanvas.SetActive (false);
-
+			loginCanvas.SetActive (false);
 		} else if (this.gameObject.name == "DepositCanvas") {
 
 			transferCanvas.SetActive (false);
@@ -70,7 +71,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 			withdrawConfirmationCanvas.SetActive (false);
 			depositConfirmationCanvas.SetActive (false);
 			introCanvas.SetActive (false);
-
+			loginCanvas.SetActive (false);
 		} else if (this.gameObject.name == "SuccessCanvas") {
 
 			transferCanvas.SetActive (false);
@@ -80,6 +81,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 			withdrawConfirmationCanvas.SetActive (false);
 			depositConfirmationCanvas.SetActive (false);
 			introCanvas.SetActive (false);
+			loginCanvas.SetActive (false);
 
 		} else if (this.gameObject.name == "WithdrawConfirmationCanvas") {
 
@@ -90,6 +92,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 			selectActionCanvas.SetActive (false);
 			depositConfirmationCanvas.SetActive (false);
 			introCanvas.SetActive (false);
+			loginCanvas.SetActive (false);
 
 		} else if (this.gameObject.name == "DepositConfirmationCanvas") {
 
@@ -100,6 +103,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 			withdrawConfirmationCanvas.SetActive (false);
 			selectActionCanvas.SetActive (false);
 			introCanvas.SetActive (false);
+			loginCanvas.SetActive (false);
 		} 
 		else if (this.gameObject.name == "IntroCanvas") {
 
@@ -110,6 +114,18 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 			depositConfirmationCanvas.SetActive (false);
 			withdrawConfirmationCanvas.SetActive (false);
 			selectActionCanvas.SetActive (false);
+			loginCanvas.SetActive (false);
+		} 
+		else if (this.gameObject.name == "LoginCanvas") {
+
+			transferCanvas.SetActive (false);
+			withdrawCanvas.SetActive (false);
+			depositCanvas.SetActive (false);
+			successCanvas.SetActive (false);
+			depositConfirmationCanvas.SetActive (false);
+			withdrawConfirmationCanvas.SetActive (false);
+			selectActionCanvas.SetActive (false);
+			introCanvas.SetActive (false);
 		} 
 	}
 	
@@ -193,7 +209,12 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 					selectActionCanvas.gameObject.SetActive (true);
 				}
 			}
+			else if (loginCanvas.activeInHierarchy == true){
+				if (this.gameObject.name == "IntroButton") {
 
+					selectActionCanvas.gameObject.SetActive (true);
+				}
+			}
 			else if (withdrawCanvas.activeInHierarchy == true) {
 
 				if (this.gameObject.name == "Plus20") {
