@@ -1,6 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
@@ -8,9 +6,12 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 
 	//All ATM screens
 	public GameObject selectActionCanvas;
-	public GameObject transferCanvas;
 
-	public GameObject withdrawCanvas;
+	public GameObject transferCanvas;
+    public GameObject transferOverdraft;
+    public GameObject transferConfirmation;
+
+    public GameObject withdrawCanvas;
     public GameObject withdrawOverdraft;
     public GameObject withdrawConfirmation;
 
@@ -21,21 +22,28 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 	public GameObject loginCanvas;
 
     //On screen text, which updates as users click buttons
-    public GameObject wCTxt,dCTxt;
+    public GameObject wCTxt,dCTxt,tCTxt;
 
     public InputField depositAmt, transAmt;
 
     public Text withdrawAmntTxt, wAmt2, wCHQTxt, wSAVTxt, wVISATxt, wACC1Txt, wACC2Txt, wFromTxt, wNBTxt, wOBalance, wOFrom,
         dCHQTxt, dSAVTxt, dVISATxt, dACC1Txt, dACC2Txt, dToTxt, dAmntTxt, dNBTxt,
-        fromCHQTxt, fromSAVTxt, fromVISATxt, fromACC1Txt, fromACC2Txt,
-        toCHQTxt, toSAVTxt, toVISATxt, toACC1Txt, toACC2Txt;
-        
+        fCHQTxt, fSAVTxt, fVISATxt, fACC1Txt, fACC2Txt,
+        tCHQTxt, tSAVTxt, tVISATxt, tACC1Txt, tACC2Txt,
+        tFromTxt, tToTxt, tOBalanceTxt, tOAccTxt, tFBalanceTxt, tTBalanceTxt;
+
 
     public Button wCHQ, wSAV, wVISA, wACC1, wACC2, wOProc, wOCanc, wProc, wCanc, wConfirm,
-        dCHQ, dSAV, dVISA, dACC1, dACC2, dProc, dCanc, dConfirm;
+        dCHQ, dSAV, dVISA, dACC1, dACC2, dProc, dCanc, dConfirm,
+        fCHQ, fSAV, fVISA, fACC1, fACC2,
+        tCHQ, tSAV, tVISA, tACC1, tACC2,
+        tProc, tCanc, tOProc, tOCanc, tConfirm;
 
     public static bool canWithDraw = false;
     public static bool canDeposit= false;
+    public static bool pickedFrom = false;
+    public static bool pickedTo = false;
+
     //Numerical monetary values
     public static double CHQ = 1000.00;
     public static double SAV = 400.00;
@@ -43,7 +51,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
     public static double ACCT1 = 10.00;
     public static double ACCT2 = 0.00;
 
-	public static double withdrawAmnt, depositAmnt, transferAmnt, wTemp,dTemp = 0.00;
+	public static double withdrawAmnt, depositAmnt, transferAmnt, wTemp,dTemp,fTemp,tTemp = 0.00;
 	public static string toAcct, fromAcct, withdrawAcct, depositAcct;
     public int wACC = 0;
     public int dACC = 0;
@@ -76,7 +84,346 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
         dConfirm.onClick.AddListener(depConfirm);
         dProc.onClick.AddListener(deposit);
         dCanc.onClick.AddListener(depCancel);
+
+        //Transfer Buttons
+        fCHQ.onClick.AddListener(() => transFrom(1));
+        fSAV.onClick.AddListener(() => transFrom(2));
+        fVISA.onClick.AddListener(() => transFrom(3));
+        fACC1.onClick.AddListener(() => transFrom(4));
+        fACC2.onClick.AddListener(() => transFrom(5));
+        tCHQ.onClick.AddListener(() => transTo(1));
+        tSAV.onClick.AddListener(() => transTo(2));
+        tVISA.onClick.AddListener(() => transTo(3));
+        tACC1.onClick.AddListener(() => transTo(4));
+        tACC2.onClick.AddListener(() => transTo(5));
+
+        tConfirm.onClick.AddListener(transConfirm);
+        tOProc.onClick.AddListener(transOProc);
+        tOCanc.onClick.AddListener(transCancel);
+        tProc.onClick.AddListener(transfer);
+        tCanc.onClick.AddListener(transCancel);
     }
+
+    //Transfer helper Functions
+    void transFrom(int i)
+    {
+        pickedFrom = true;
+        switch (i)
+        {
+            case 1:
+                fACC = 1;
+                tFromTxt.text = "Chequing";
+                transFromReset();
+                fCHQ.GetComponent<Image>().color = Color.green;
+                break;
+            case 2:
+                fACC = 2;
+                transFromReset();
+                tFromTxt.text = "Savings";
+                fSAV.GetComponent<Image>().color = Color.green;
+                
+                break;
+            case 3:
+                fACC = 3;
+                transFromReset();
+                tFromTxt.text = "VISA";
+                fVISA.GetComponent<Image>().color = Color.green;
+                
+                break;
+            case 4:
+                fACC = 4;
+                transFromReset();
+                tFromTxt.text = "Account 1";
+                fACC1.GetComponent<Image>().color = Color.green;
+                
+                break;
+            case 5:
+                fACC = 5;
+                transFromReset();
+                tFromTxt.text = "Account 2";
+                fACC2.GetComponent<Image>().color = Color.green;
+                
+                break;
+            case 6:
+                fACC = 0;
+                break;
+        }
+    }
+    void transTo(int i)
+    {
+        pickedTo = true;
+        switch (i)
+        {
+            case 1:
+                tACC = 1;
+                tToTxt.text = "Chequing";
+                transToReset();
+                tCHQ.GetComponent<Image>().color = Color.green;
+                break;
+            case 2:
+                transToReset();
+                tToTxt.text = "Savings";
+                tSAV.GetComponent<Image>().color = Color.green;
+                tACC = 2;
+                break;
+            case 3:
+                transToReset();
+                tToTxt.text = "VISA";
+                tVISA.GetComponent<Image>().color = Color.green;
+                tACC = 3;
+                break;
+            case 4:
+                transToReset();
+                tToTxt.text = "Account 1";
+                tACC1.GetComponent<Image>().color = Color.green;
+                tACC = 4;
+                break;
+            case 5:
+                transToReset();
+                tToTxt.text = "Account 2";
+                tACC2.GetComponent<Image>().color = Color.green;
+                tACC = 5;
+                break;
+            case 6:
+                tACC = 0;
+                break;
+        }
+    }
+    void transFromDisp()
+    {
+        if (transferCanvas.activeInHierarchy == true)
+        {
+            if (double.TryParse(transAmt.text, out transferAmnt))
+            {
+
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(transAmt.text) && transAmt.text != " ")
+                {
+                    transAmt.text = "0.00";
+                    transferAmnt = 0.00f;
+                }
+                else
+                {
+                    transferAmnt = 0.00f;
+                }
+            }
+            if (transferAmnt < 0)
+            {
+                transferAmnt *= -1;
+                transAmt.text = transferAmnt.ToString();
+            }
+            Debug.Log(transferAmnt.ToString());
+            switch (fACC)
+            {
+                case 0:
+                    break;
+                case 1:
+                    fTemp = CHQ - transferAmnt;
+                    fCHQTxt.text = "$" + fTemp.ToString();
+                    if (fTemp < 0)
+                    {
+                        fCHQTxt.color = Color.red;
+                    }
+                    break;
+                case 2:
+                    fTemp = SAV - transferAmnt;
+                    fSAVTxt.text = "$" + fTemp.ToString();
+                    if (fTemp < 0)
+                    {
+                        fSAVTxt.color = Color.red;
+                    }
+                    break;
+                case 3:
+                    fTemp = VISA - transferAmnt;
+                    fVISATxt.text = "$" + fTemp.ToString();
+                    if (fTemp < 0)
+                    {
+                        fVISATxt.color = Color.red;
+                    }
+                    break;
+                case 4:
+                    fTemp = ACCT1 - transferAmnt;
+                    fACC1Txt.text = "$" + fTemp.ToString();
+                    if (fTemp < 0)
+                    {
+                        fACC1Txt.color = Color.red;
+                    }
+                    break;
+                case 5:
+                    fTemp = ACCT2 - transferAmnt;
+                    fACC2Txt.text = "$" + fTemp.ToString();
+                    if (fTemp < 0)
+                    {
+                        fACC2Txt.color = Color.red;
+                    }
+                    break;
+            }
+        }
+    }
+    void transToDisp()
+    {
+        if (transferCanvas.activeInHierarchy == true)
+        {
+            switch (tACC)
+            {
+                case 0:
+                    break;
+                case 1:
+                    tTemp = CHQ + transferAmnt;
+                    tCHQTxt.text = "$" + tTemp.ToString();
+                    if (tTemp > 0)
+                    {
+                        tCHQTxt.color = Color.green;
+                    }
+                    break;
+                case 2:
+                    tTemp = SAV + transferAmnt;
+                    tSAVTxt.text = "$" + tTemp.ToString();
+                    if (tTemp > 0)
+                    {
+                        tSAVTxt.color = Color.green;
+                    }
+                    break;
+                case 3:
+                    tTemp = VISA + transferAmnt;
+                    tVISATxt.text = "$" + tTemp.ToString();
+                    if (tTemp > 0)
+                    {
+                        tVISATxt.color = Color.green;
+                    }
+                    break;
+                case 4:
+                    tTemp = ACCT1 + transferAmnt;
+                    tACC1Txt.text = "$" + tTemp.ToString();
+                    if (tTemp > 0)
+                    {
+                        tACC1Txt.color = Color.green;
+                    }
+                    break;
+                case 5:
+                    tTemp = ACCT2 + transferAmnt;
+                    tACC2Txt.text = "$" + tTemp.ToString();
+                    if (tTemp > 0)
+                    {
+                        tACC2Txt.color = Color.green;
+                    }
+                    break;
+            }
+        }
+    }
+    void transConfirm()
+    {
+        
+   
+            tFBalanceTxt.text = "$" + fTemp.ToString();
+            tTBalanceTxt.text = "$" + tTemp.ToString();
+            //wAmt2.text = withdrawAmnt.ToString();
+            transferConfirmation.SetActive(true);
+        
+    }
+    void transOProc()
+    {
+        tTBalanceTxt.text = tTemp.ToString();
+        tFBalanceTxt.text = fTemp.ToString();
+
+    }
+    void transCancel()
+    {
+        pickedFrom = false;
+        pickedTo = false;
+        fTemp = 0;
+        tTemp = 0;
+        transAmt.text = "0.00";
+        transFromReset();
+        transToReset();
+        transferConfirmation.SetActive(false);
+        transferCanvas.SetActive(true);
+    }
+    void transFromReset()
+    {
+        fCHQ.GetComponent<Image>().color = click;
+        fSAV.GetComponent<Image>().color = click;
+        fVISA.GetComponent<Image>().color = click;
+        fACC1.GetComponent<Image>().color = click;
+        fACC2.GetComponent<Image>().color = click;
+    }
+    void transToReset()
+    {
+        tCHQ.GetComponent<Image>().color = click;
+        tSAV.GetComponent<Image>().color = click;
+        tVISA.GetComponent<Image>().color = click;
+        tACC1.GetComponent<Image>().color = click;
+        tACC2.GetComponent<Image>().color = click;
+
+       
+        //tCHQ.interactable = true;
+        //tSAV.interactable = true;
+        //tVISA.interactable = true;
+        //tACC1.interactable = true;
+        //tACC2.interactable = true;
+    }
+    void transfer()
+    {
+        pickedFrom = false;
+        switch (fACC)
+        {
+            case 1:
+                CHQ -= transferAmnt;
+                //Debug.Log(CHQ.ToString());
+                break;
+            case 2:
+                SAV -= transferAmnt;
+               // Debug.Log(SAV.ToString());
+                break;
+            case 3:
+                VISA -= transferAmnt;
+                //Debug.Log(VISA.ToString());
+                break;
+            case 4:
+                ACCT1 -= transferAmnt;
+                //Debug.Log(ACCT1.ToString());
+                break;
+            case 5:
+                ACCT2 -= transferAmnt;
+               // Debug.Log(ACCT2.ToString());
+                break;
+        }
+        switch (tACC)
+        {
+            case 1:
+                CHQ += transferAmnt;
+              //  Debug.Log(CHQ.ToString());
+                break;
+            case 2:
+                SAV += transferAmnt;
+                //Debug.Log(SAV.ToString());
+                break;
+            case 3:
+                VISA += transferAmnt;
+                //Debug.Log(VISA.ToString());
+                break;
+            case 4:
+                ACCT1 += transferAmnt;
+                //Debug.Log(ACCT1.ToString());
+                break;
+            case 5:
+                ACCT2 += transferAmnt;
+                //Debug.Log(ACCT2.ToString());
+                break;
+        }
+        pickedTo = false;
+        transAmt.text = "0.00";
+        transferAmnt = 0.00;
+        transFromReset();
+        transToReset();
+        dToTxt.text = "";
+        dTemp = 0;
+        dACC = 0;
+        selectActionCanvas.SetActive(true);
+    }
+
     //7 withdrawal helper functions
     void withDrawal(int i)
     {
@@ -412,7 +759,13 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
         dACC = 0;
         selectActionCanvas.SetActive(true);
     }
-
+    //Logout Fxn
+    void logout()
+    {
+        withCancel();
+        depCancel();
+        transCancel();
+    }
     // Use this for initialization
     void OnEnable () {
 
@@ -427,6 +780,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
             withdrawConfirmation.SetActive(false);
             depositConfirmation.SetActive(false);
         } else if (this.gameObject.name == "TransferCanvas") {
+            transferConfirmation.SetActive(false);
             depositConfirmation.SetActive(false);
             selectActionCanvas.SetActive (false);
             withdrawCanvas.SetActive (false);
@@ -508,6 +862,16 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
             withdrawOverdraft.SetActive(false);
             withdrawConfirmation.SetActive(false);
         }
+        else if (this.gameObject.name == "TransferConfirmCanvas")
+        {
+            depositCanvas.SetActive(false);
+            depositConfirmation.SetActive(false);
+            loginCanvas.SetActive(false);
+            selectActionCanvas.SetActive(false);
+            introCanvas.SetActive(false);
+            withdrawOverdraft.SetActive(false);
+            withdrawConfirmation.SetActive(false);
+        }
     }
 	
 	// Update is called once per frame
@@ -516,62 +880,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 		if (this.gameObject.name == "WithdrawAmntTxt") {
 			withdrawAmntTxt.text = withdrawAmnt.ToString();
 		}
-
-		if (this.gameObject.name == "CHQtxt") {
-			fromCHQTxt.text = "$" + CHQ.ToString ();
-			toCHQTxt.text ="$" +  CHQ.ToString ();
-			if (CHQ < 0) {
-				toCHQTxt.color = Color.red;
-				fromCHQTxt.color = Color.red;
-			} else {
-				toCHQTxt.color = Color.green;
-				fromCHQTxt.color = Color.green;
-			}
-		}
-		else if (this.gameObject.name == "SAVtxt") {
-			fromSAVTxt.text ="$" +  SAV.ToString ();
-			toSAVTxt.text ="$" +  SAV.ToString ();
-			if (SAV < 0) {
-				fromSAVTxt.color = Color.red;
-				toSAVTxt.color = Color.red;
-			} else {
-				fromSAVTxt.color = Color.green;
-				toSAVTxt.color = Color.green;
-			}
-		}
-		else if (this.gameObject.name == "VISAtxt") {
-			fromVISATxt.text = "$" + VISA.ToString ();
-			toVISATxt.text = "$" + VISA.ToString ();
-			if (VISA < 0) {
-				fromVISATxt.color = Color.red;
-				toVISATxt.color = Color.red;
-			} else {
-				fromVISATxt.color = Color.green;
-				toVISATxt.color = Color.green;
-			}
-		}
-		else if (this.gameObject.name == "ACC1txt") {
-			fromACC1Txt.text = "$" + ACCT1.ToString ();
-			toACC1Txt.text = "$" + ACCT1.ToString ();
-			if (ACCT1 < 0) {
-				fromACC1Txt.color = Color.red;
-				toACC1Txt.color = Color.red;
-			} else {
-				fromACC1Txt.color = Color.green;
-				toACC1Txt.color = Color.green;
-			}
-		}
-		else if (this.gameObject.name == "ACC2txt") {
-			fromACC2Txt.text = "$" + ACCT2.ToString ();
-			toACC2Txt.text = "$" + ACCT2.ToString ();
-			if (ACCT2 < 0) {
-				fromACC2Txt.color = Color.red;
-				toACC2Txt.color = Color.red;
-			} else {
-				fromACC2Txt.color = Color.green;
-				toACC2Txt.color = Color.green;
-			}
-		}
+        
         if (withdrawAmnt < 0)
         {
             withdrawAmnt = 0;
@@ -587,6 +896,10 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
         if (transferAmnt < 0)
         {
             transferAmnt = 0;
+        }
+        if (transferAmnt > 10000)
+        {
+            transferAmnt = 10000;
         }
 
         //withdraw & deposot/view screen stuff
@@ -610,6 +923,19 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
             dCTxt.SetActive(false);
             dConfirm.interactable = false;
         }
+        if (pickedFrom && pickedTo)
+        {
+            transAmt.interactable = true;
+            tConfirm.interactable = true;
+            tCTxt.SetActive(true);
+        }
+        else
+        {
+            transAmt.interactable = true;
+            tCTxt.SetActive(false);
+            tConfirm.interactable = false;
+        }
+
         wCHQTxt.text = "$" + CHQ.ToString();
         wSAVTxt.text = "$" + SAV.ToString();
         wVISATxt.text = "$" + VISA.ToString();
@@ -622,60 +948,93 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
         dACC1Txt.text = "$" + ACCT1.ToString();
         dACC2Txt.text = "$" + ACCT2.ToString();
 
+        fCHQTxt.text = "$" + CHQ.ToString();
+        fSAVTxt.text = "$" + SAV.ToString();
+        fVISATxt.text = "$" + VISA.ToString();
+        fACC1Txt.text = "$" + ACCT1.ToString();
+        fACC2Txt.text = "$" + ACCT2.ToString();
+
+        tCHQTxt.text = "$" + CHQ.ToString();
+        tSAVTxt.text = "$" + SAV.ToString();
+        tVISATxt.text = "$" + VISA.ToString();
+        tACC1Txt.text = "$" + ACCT1.ToString();
+        tACC2Txt.text = "$" + ACCT2.ToString();
+
         if (CHQ < 0)
         {
             wCHQTxt.color = Color.red;
             dCHQTxt.color = Color.red;
+            fCHQTxt.color = Color.red;
+            tCHQTxt.color = Color.red;
         }
         else
         {
             wCHQTxt.color = Color.green;
             dCHQTxt.color = Color.green;
+            fCHQTxt.color = Color.green;
+            tCHQTxt.color = Color.green;
         }
         if (SAV < 0)
         {
             wSAVTxt.color = Color.red;
             dSAVTxt.color = Color.red;
+            fSAVTxt.color = Color.red;
+            tSAVTxt.color = Color.red;
         }
         else
         {
             wSAVTxt.color = Color.green;
             dSAVTxt.color = Color.green;
+            fSAVTxt.color = Color.green;
+            tSAVTxt.color = Color.green;
         }
         if (VISA < 0)
         {
             wVISATxt.color = Color.red;
             dVISATxt.color = Color.red;
+            fVISATxt.color = Color.red;
+            tVISATxt.color = Color.red;
         }
         else
         {
             wVISATxt.color = Color.green;
             dVISATxt.color = Color.green;
+            fVISATxt.color = Color.green;
+            tVISATxt.color = Color.green;
         }
         if (ACCT1 < 0)
         {
             wACC1Txt.color = Color.red;
             dACC1Txt.color = Color.red;
+            fACC1Txt.color = Color.red;
+            tACC1Txt.color = Color.red;
         }
         else
         {
             wACC1Txt.color = Color.green;
             dACC1Txt.color = Color.green;
+            fACC1Txt.color = Color.green;
+            tACC1Txt.color = Color.green;
         }
         if (ACCT2 < 0)
         {
             wACC2Txt.color = Color.red;
             dACC2Txt.color = Color.red;
+            fACC2Txt.color = Color.red;
+            tACC2Txt.color = Color.red;
         }
         else
         {
             wACC2Txt.color = Color.green;
             dACC2Txt.color = Color.green;
+            fACC2Txt.color = Color.green;
+            tACC2Txt.color = Color.green;
         }
         
         dispWithdraw();
         dispDeposit();
-
+        transFromDisp();
+        transToDisp();
 	}
 
 	//Button input handlers - when a certain button is clicked, either activate a new screen, or update a numerical value
@@ -685,12 +1044,14 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 
 			//Return to home screen
 			if (this.gameObject.name == "Home") {
+                logout();
 				selectActionCanvas.SetActive (true);
 
 			} 
 
 			if (this.gameObject.name == "Logout") {
-				introCanvas.SetActive (true);
+                logout();
+                introCanvas.SetActive (true);
 			} 
 			
 			if (selectActionCanvas.activeInHierarchy == true) {
