@@ -293,49 +293,69 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
     {
         if (depositCanvas.activeInHierarchy == true)
         {
+            if (double.TryParse(depositAmt.text, out depositAmnt))
+            {
 
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(depositAmt.text) && depositAmt.text != " ")
+                {
+                    depositAmt.text = "0.00";
+                    depositAmnt = 0.00f;
+                }
+                else
+                {
+                    depositAmnt = 0.00f;
+                }
+            }
+            if (depositAmnt < 0)
+            {
+                depositAmnt *= -1;
+                depositAmt.text = depositAmnt.ToString();
+            }
             switch (dACC)
             {
                 case 0:
                     break;
                 case 1:
-                    dTemp = CHQ + withdrawAmnt;
+                    dTemp = CHQ + depositAmnt;
                     dCHQTxt.text = "$" + dTemp.ToString();
-                    if (wTemp < 0)
+                    if (dTemp > 0)
                     {
-                        wCHQTxt.color = Color.red;
+                        dCHQTxt.color = Color.green;
                     }
                     break;
                 case 2:
-                    dTemp = SAV + withdrawAmnt;
+                    dTemp = SAV + depositAmnt;
                     dSAVTxt.text = "$" + dTemp.ToString();
-                    if (dTemp < 0)
+                    if (dTemp > 0)
                     {
-                        dSAVTxt.color = Color.red;
+                        dSAVTxt.color = Color.green;
                     }
                     break;
                 case 3:
-                    dTemp = VISA + withdrawAmnt;
+                    dTemp = VISA + depositAmnt;
                     dVISATxt.text = "$" + dTemp.ToString();
-                    if (dTemp < 0)
+                    if (dTemp > 0)
                     {
-                        dVISATxt.color = Color.red;
+                        dVISATxt.color = Color.green;
                     }
                     break;
                 case 4:
-                    dTemp = ACCT1 + withdrawAmnt;
-                    wACC1Txt.text = "$" + dTemp.ToString();
-                    if (dTemp < 0)
+                    dTemp = ACCT1 + depositAmnt;
+                    dACC1Txt.text = "$" + dTemp.ToString();
+                    if (dTemp > 0)
                     {
-                        dACC1Txt.color = Color.red;
+                        dACC1Txt.color = Color.green;
                     }
                     break;
                 case 5:
-                    dTemp = ACCT2 + withdrawAmnt;
+                    dTemp = ACCT2 + depositAmnt;
                     dACC2Txt.text = "$" + dTemp.ToString();
-                    if (dTemp < 0)
+                    if (dTemp > 0)
                     {
-                        dACC2Txt.color = Color.red;
+                        dACC2Txt.color = Color.green;
                     }
                     break;
             }
@@ -351,6 +371,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
     {
         canDeposit = false;
         dTemp = 0;
+        depositAmt.text = "0.00";
         dACC = 0;
         depReset();
         depositConfirmation.SetActive(false);
@@ -358,33 +379,40 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
     }
     void deposit()
     {
+        Debug.Log(depositAmnt.ToString());
         canDeposit = false;
-        selectActionCanvas.SetActive(true);
-        switch (wACC)
+        switch (dACC)
         {
             case 1:
                 CHQ += depositAmnt;
+                Debug.Log(CHQ.ToString());
                 break;
             case 2:
                 SAV += depositAmnt;
+                Debug.Log(SAV.ToString());
                 break;
             case 3:
                 VISA += depositAmnt;
+                Debug.Log(VISA.ToString());
                 break;
             case 4:
                 ACCT1 += depositAmnt;
+                Debug.Log(ACCT1.ToString());
                 break;
             case 5:
                 ACCT2 += depositAmnt;
+                Debug.Log(ACCT2.ToString());
                 break;
         }
-
-        withReset();
-        wFromTxt.text = "";
-        wTemp = 0;
-        wACC = 0;
-        withdrawAmnt = 0;
+        depositAmt.text = "0.00";
+        depositAmnt = 0.00;
+        depReset();
+        dToTxt.text = "";
+        dTemp = 0;
+        dACC = 0;
+        selectActionCanvas.SetActive(true);
     }
+
     // Use this for initialization
     void OnEnable () {
 
