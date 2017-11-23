@@ -199,30 +199,19 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 				toACC2Txt.color = Color.green;
 			}
 		}
-	
-
-//		CHQTxt.text = CHQ.ToString ();
-//		if (this.gameObject.name == "chqtxt") {
-//			CHQTxt.text = CHQ.ToString();
-//		}
-//
-//		if (this.gameObject.name == "SAVTxt") {
-//			SAVTxt.text = SAV.ToString();
-//		}
-//
-//		if (this.gameObject.name == "VISATxt") {
-//			VISATxt.text = VISA.ToString();
-//		}
-//
-//		if (this.gameObject.name == "Acct1Txt") {
-//			Acct1Txt.text = ACCT1.ToString();
-//		}
-//
-//		if (this.gameObject.name == "Acct2Txt") {
-//			Acct2Txt.text = ACCT2.ToString();
-//		}
-//
-		fromAcct = fromAcctTxt.text;
+        if (withdrawAmnt < 0)
+        {
+            withdrawAmnt = 0;
+        }
+        if (depositAmnt < 0)
+        {
+            depositAmnt = 0;
+        }
+        if (transferAmnt < 0)
+        {
+            transferAmnt = 0;
+        }
+        fromAcct = fromAcctTxt.text;
 		toAcct = toAcctTxt.text;
 		depositAcct = depositAcctTxt.text;
 		withdrawAcct = withdrawAmntTxt.text;
