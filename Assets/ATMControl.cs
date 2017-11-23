@@ -20,20 +20,27 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 	public GameObject loginCanvas;
 
 	//On screen text, which updates as users click buttons
-	public Text withdrawAmntTxt, fromAcctTxt, toAcctTxt, depositAcctTxt, CHQTxt, SAVTxt, VISATxt, Acct1Txt, Acct2Txt;
+	public Text withdrawAmntTxt, fromAcctTxt, toAcctTxt, depositAcctTxt, fromCHQTxt, 
+	fromSAVTxt, fromVISATxt, fromACC1Txt, fromACC2Txt,
+		toCHQTxt, toSAVTxt, toVISATxt, toACC1Txt, toACC2Txt;
 
 	//Numerical monetary values
 	public static double CHQ, SAV, VISA, ACCT1, ACCT2 = 1000.00;
 	public static double withdrawAmnt, depositAmnt, transferAmnt = 0.00;
-
 	public static string toAcct, fromAcct, withdrawAcct, depositAcct;
 
+	void Start(){
+		CHQ = 1000.00;
+		SAV = 400.00;
+		VISA = -100.00;
+		ACCT1 = 10.00;
+		ACCT2 = 500.00;
+	}
 	// Use this for initialization
 	void OnEnable () {
 
 		//Only one screen can stay active at a time
 		if (this.gameObject.name == "SelectActionCanvas") {
-
 			introCanvas.SetActive (false);
 			transferCanvas.SetActive (false);
 			withdrawCanvas.SetActive (false);
@@ -42,6 +49,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 			withdrawConfirmationCanvas.SetActive (false);
 			depositConfirmationCanvas.SetActive (false);
 			loginCanvas.SetActive (false);
+
 		} else if (this.gameObject.name == "TransferCanvas") {
 
 			selectActionCanvas.SetActive (false);
@@ -131,32 +139,89 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 	
 	// Update is called once per frame
 	void Update () {
-
 		//Constantly update text displays
 		if (this.gameObject.name == "WithdrawAmntTxt") {
 			withdrawAmntTxt.text = withdrawAmnt.ToString();
 		}
 
-		if (this.gameObject.name == "CHQTxt") {
-			CHQTxt.text = CHQ.ToString();
+		if (this.gameObject.name == "CHQtxt") {
+			fromCHQTxt.text = "$" + CHQ.ToString ();
+			toCHQTxt.text ="$" +  CHQ.ToString ();
+			if (CHQ < 0) {
+				toCHQTxt.color = Color.red;
+				fromCHQTxt.color = Color.red;
+			} else {
+				toCHQTxt.color = Color.green;
+				fromCHQTxt.color = Color.green;
+			}
 		}
-
-		if (this.gameObject.name == "SAVTxt") {
-			SAVTxt.text = SAV.ToString();
+		else if (this.gameObject.name == "SAVtxt") {
+			fromSAVTxt.text ="$" +  SAV.ToString ();
+			toSAVTxt.text ="$" +  SAV.ToString ();
+			if (SAV < 0) {
+				fromSAVTxt.color = Color.red;
+				toSAVTxt.color = Color.red;
+			} else {
+				fromSAVTxt.color = Color.green;
+				toSAVTxt.color = Color.green;
+			}
 		}
-
-		if (this.gameObject.name == "VISATxt") {
-			VISATxt.text = VISA.ToString();
+		else if (this.gameObject.name == "VISAtxt") {
+			fromVISATxt.text = "$" + VISA.ToString ();
+			toVISATxt.text = "$" + VISA.ToString ();
+			if (VISA < 0) {
+				fromVISATxt.color = Color.red;
+				toVISATxt.color = Color.red;
+			} else {
+				fromVISATxt.color = Color.green;
+				toVISATxt.color = Color.green;
+			}
 		}
-
-		if (this.gameObject.name == "Acct1Txt") {
-			Acct1Txt.text = ACCT1.ToString();
+		else if (this.gameObject.name == "ACC1txt") {
+			fromACC1Txt.text = "$" + ACCT1.ToString ();
+			toACC1Txt.text = "$" + ACCT1.ToString ();
+			if (ACCT1 < 0) {
+				fromACC1Txt.color = Color.red;
+				toACC1Txt.color = Color.red;
+			} else {
+				fromACC1Txt.color = Color.green;
+				toACC1Txt.color = Color.green;
+			}
 		}
-
-		if (this.gameObject.name == "Acct2Txt") {
-			Acct2Txt.text = ACCT2.ToString();
+		else if (this.gameObject.name == "ACC2txt") {
+			fromACC2Txt.text = "$" + ACCT2.ToString ();
+			toACC2Txt.text = "$" + ACCT2.ToString ();
+			if (ACCT2 < 0) {
+				fromACC2Txt.color = Color.red;
+				toACC2Txt.color = Color.red;
+			} else {
+				fromACC2Txt.color = Color.green;
+				toACC2Txt.color = Color.green;
+			}
 		}
+	
 
+//		CHQTxt.text = CHQ.ToString ();
+//		if (this.gameObject.name == "chqtxt") {
+//			CHQTxt.text = CHQ.ToString();
+//		}
+//
+//		if (this.gameObject.name == "SAVTxt") {
+//			SAVTxt.text = SAV.ToString();
+//		}
+//
+//		if (this.gameObject.name == "VISATxt") {
+//			VISATxt.text = VISA.ToString();
+//		}
+//
+//		if (this.gameObject.name == "Acct1Txt") {
+//			Acct1Txt.text = ACCT1.ToString();
+//		}
+//
+//		if (this.gameObject.name == "Acct2Txt") {
+//			Acct2Txt.text = ACCT2.ToString();
+//		}
+//
 		fromAcct = fromAcctTxt.text;
 		toAcct = toAcctTxt.text;
 		depositAcct = depositAcctTxt.text;
@@ -168,9 +233,6 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 	public void OnPointerDown(PointerEventData eventData)
 	{
 		Debug.Log(this.gameObject.name + " Was Clicked.");
-
-
-			
 
 			//Return to home screen
 			if (this.gameObject.name == "Home") {
@@ -284,142 +346,142 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 				}
 
 			}
-
-			else if (successCanvas.activeInHierarchy == true) {
-			
-				if (this.gameObject.name == "Return") {
-
-					selectActionCanvas.gameObject.SetActive (true);
-					successCanvas.gameObject.SetActive(false);
-				}
-			}
-
-			else if (withdrawConfirmationCanvas.activeInHierarchy == true) {
-
-				if (this.gameObject.name == "Confirm") {
-
-					if (withdrawAcct == "CHQ") {
-						CHQ -= withdrawAmnt;
-					}
-
-					//TODO Repeat for other accounts and display the amount
-				}
-				
-			}
-
-			else if (depositConfirmationCanvas.activeInHierarchy == true) {
-
-				if (this.gameObject.name == "Confirm") {
-
-					depositConfirmationCanvas2.gameObject.SetActive(true);
-					depositConfirmationCanvas.gameObject.SetActive(true);
-				}
-
-				if (this.gameObject.name == "Cancel") {
-
-					depositCanvas.gameObject.SetActive (true);
-					depositConfirmationCanvas.gameObject.SetActive(false);
-				}
-			}
-
-			else if (depositConfirmationCanvas2.activeInHierarchy == true) {
-
-				if (this.gameObject.name == "Confirm") {
-
-					if (depositAcct == "CHQ") {
-						CHQ += Random.Range (20, 2000);
-					}
-
-				//TODO Repeat for other accounts and display the amount
-				}
-
-				if (this.gameObject.name == "Cancel") {
-
-					depositCanvas.gameObject.SetActive (true);
-					depositConfirmationCanvas.gameObject.SetActive(false);
-				}
-			}
-
-			else if (transferCanvas.activeInHierarchy == true) {
-
-				if (this.gameObject.name == "FROMCHQ") {
-
-					fromAcctTxt.text = "CHQ";
-				}
-
-				if (this.gameObject.name == "FROMSAV") {
-
-					fromAcctTxt.text = "SAV";
-				}
-
-				if (this.gameObject.name == "FROMVISA") {
-					
-					fromAcctTxt.text = fromAcct = "VISA";
-				}
-
-				if (this.gameObject.name == "FROMACCT1") {
-					
-					fromAcctTxt.text = "ACCT1";
-				}
-
-				if (this.gameObject.name == "FROMACCT2") {
-
-					fromAcctTxt.text = "ACCT2";
-				}
-
-
-				if (this.gameObject.name == "TOCHQ") {
-
-					toAcctTxt.text = "CHQ";
-				}
-
-				if (this.gameObject.name == "TOSAV") {
-
-					toAcctTxt.text = "SAV";
-				}
-
-				if (this.gameObject.name == "TOVISA") {
-
-					toAcctTxt.text = "VISA";
-				}
-
-				if (this.gameObject.name == "TOACCT1") {
-
-					toAcctTxt.text = "ACCT1";
-				}
-
-				if (this.gameObject.name == "TOACCT2") {
-
-					toAcctTxt.text = "ACCT2";
-				}
-
-				if (this.gameObject.name == "Confirm") {
-
-					transferConfirmationCanvas.gameObject.SetActive(true);
-				}
-
-			}
-
-			else if (transferConfirmationCanvas.activeInHierarchy == true) {
-
-				if (this.gameObject.name == "Confirm") {
-
-					if (fromAcct == "CHQ") {
-					
-						if (toAcct == "SAV") {
-							SAV += transferAmnt;
-							CHQ -= transferAmnt;
-						}
-					
-					//TODO Repeat for other accounts and display the amount
-				}
-			}
-
-				if (this.gameObject.name == "Cancel") {
-
-					depositCanvas.gameObject.SetActive (true);
-					depositConfirmationCanvas.gameObject.SetActive(false);
-				}
-		}
+//
+//			else if (successCanvas.activeInHierarchy == true) {
+//			
+//				if (this.gameObject.name == "Return") {
+//
+//					selectActionCanvas.gameObject.SetActive (true);
+//					successCanvas.gameObject.SetActive(false);
+//				}
+//			}
+//
+//			else if (withdrawConfirmationCanvas.activeInHierarchy == true) {
+//
+//				if (this.gameObject.name == "Confirm") {
+//
+//					if (withdrawAcct == "CHQ") {
+//						CHQ -= withdrawAmnt;
+//					}
+//
+//					//TODO Repeat for other accounts and display the amount
+//				}
+//				
+//			}
+//
+//			else if (depositConfirmationCanvas.activeInHierarchy == true) {
+//
+//				if (this.gameObject.name == "Confirm") {
+//
+//					depositConfirmationCanvas2.gameObject.SetActive(true);
+//					depositConfirmationCanvas.gameObject.SetActive(true);
+//				}
+//
+//				if (this.gameObject.name == "Cancel") {
+//
+//					depositCanvas.gameObject.SetActive (true);
+//					depositConfirmationCanvas.gameObject.SetActive(false);
+//				}
+//			}
+//
+//			else if (depositConfirmationCanvas2.activeInHierarchy == true) {
+//
+//				if (this.gameObject.name == "Confirm") {
+//
+//					if (depositAcct == "CHQ") {
+//						CHQ += Random.Range (20, 2000);
+//					}
+//
+//				//TODO Repeat for other accounts and display the amount
+//				}
+//
+//				if (this.gameObject.name == "Cancel") {
+//
+//					depositCanvas.gameObject.SetActive (true);
+//					depositConfirmationCanvas.gameObject.SetActive(false);
+//				}
+//			}
+//
+//			else if (transferCanvas.activeInHierarchy == true) {
+//
+//				if (this.gameObject.name == "FROMCHQ") {
+//
+//					fromAcctTxt.text = "CHQ";
+//				}
+//
+//				if (this.gameObject.name == "FROMSAV") {
+//
+//					fromAcctTxt.text = "SAV";
+//				}
+//
+//				if (this.gameObject.name == "FROMVISA") {
+//					
+//					fromAcctTxt.text = fromAcct = "VISA";
+//				}
+//
+//				if (this.gameObject.name == "FROMACCT1") {
+//					
+//					fromAcctTxt.text = "ACCT1";
+//				}
+//
+//				if (this.gameObject.name == "FROMACCT2") {
+//
+//					fromAcctTxt.text = "ACCT2";
+//				}
+//
+//
+//				if (this.gameObject.name == "TOCHQ") {
+//
+//					toAcctTxt.text = "CHQ";
+//				}
+//
+//				if (this.gameObject.name == "TOSAV") {
+//
+//					toAcctTxt.text = "SAV";
+//				}
+//
+//				if (this.gameObject.name == "TOVISA") {
+//
+//					toAcctTxt.text = "VISA";
+//				}
+//
+//				if (this.gameObject.name == "TOACCT1") {
+//
+//					toAcctTxt.text = "ACCT1";
+//				}
+//
+//				if (this.gameObject.name == "TOACCT2") {
+//
+//					toAcctTxt.text = "ACCT2";
+//				}
+//
+//				if (this.gameObject.name == "Confirm") {
+//
+//					transferConfirmationCanvas.gameObject.SetActive(true);
+//				}
+//
+//			}
+//
+//			else if (transferConfirmationCanvas.activeInHierarchy == true) {
+//
+//				if (this.gameObject.name == "Confirm") {
+//
+//					if (fromAcct == "CHQ") {
+//					
+//						if (toAcct == "SAV") {
+//							SAV += transferAmnt;
+//							CHQ -= transferAmnt;
+//						}
+//					
+//					//TODO Repeat for other accounts and display the amount
+//				}
+//			}
+//
+//				if (this.gameObject.name == "Cancel") {
+//
+//					depositCanvas.gameObject.SetActive (true);
+//					depositConfirmationCanvas.gameObject.SetActive(false);
+//				}
+//		}
 	}
 }
