@@ -170,10 +170,7 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 		Debug.Log(this.gameObject.name + " Was Clicked.");
 
 
-			//TODO Back and Logout functionality
-			if (this.gameObject.name == "Back") {
-
-			} 
+			
 
 			//Return to home screen
 			if (this.gameObject.name == "Home") {
@@ -206,14 +203,14 @@ public class ATMControl : MonoBehaviour, IPointerDownHandler {
 			else if (introCanvas.activeInHierarchy == true){
 				if (this.gameObject.name == "IntroButton") {
 
-					selectActionCanvas.gameObject.SetActive (true);
+					loginCanvas.gameObject.SetActive (true);
 				}
 			}
 			else if (loginCanvas.activeInHierarchy == true){
-				if (this.gameObject.name == "IntroButton") {
+				if (this.gameObject.name == "login" || this.gameObject.name == "login2" ) {
 
-					selectActionCanvas.gameObject.SetActive (true);
-				}
+						selectActionCanvas.gameObject.SetActive (true);
+					}
 			}
 			else if (withdrawCanvas.activeInHierarchy == true) {
 
